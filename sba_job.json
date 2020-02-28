@@ -1,0 +1,82 @@
+{
+  "apiVersion": "batch/v1",
+  "kind": "Job",
+  "metadata": {
+    "annotations": null,
+    "labels": {
+      "job-name": "sba"
+    },
+    "name": "sba"
+  },
+  "spec": {
+    "completions": 1,
+    "parallelism": 1,
+    "selector": null,
+    "template": {
+      "metadata": {
+        "creationTimestamp": null,
+        "labels": {
+          "job-name": "sba"
+        },
+        "name": "sba"
+      },
+      "spec": {
+        "ttlSecondsAfterFinished": 3600,
+        "securityContext": {
+          "runAsUser": 1000,
+          "runAsGroup": 1000
+          },
+        "containers": [
+          {
+            "env": [
+              {
+                "name": "SMACONFIG",
+                "value": "/config/autoProcess.ini"
+              }
+            ],
+            "image": "jameseckersall/sba:testing",
+            "imagePullPolicy": "Always",
+            "name": "sba",
+            "resources": {
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/downloads",
+                "name": "downloads"
+              },
+              {
+                "name": "config",
+                "mountPath": "/config",
+                "subPath": "/autoProcess.ini"
+              }
+            ]
+          }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "restartPolicy": "Never",
+        "schedulerName": "default-scheduler",
+        "securityContext": {
+        },
+        "terminationGracePeriodSeconds": 30,
+        "volumes": [
+          {
+            "name": "downloads",
+            "persistentVolumeClaim": {
+              "claimName": "downloads"
+            }
+          },
+          {
+            "name": "config",
+            "configMap": {
+              "name": "sba-config"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "status": {
+  }
+}
